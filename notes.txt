@@ -1,0 +1,29 @@
+Should have 2 feature:
+1. Push message to barito
+2. Open Kibana & check if it functional
+
+Global metrics:
+- barito_appgroup_tps{appgroup, name, capacity, status, retention } tps
+- barito_app_tps{appgroup, name} tps
+
+--------
+1. Push message to barito
+Approach:
+a. Push log periodically to router to an appgroup, the exporter will count how many the increase and the delay by comparing the timestamp and actual log time
+Metrics:
+- barito_blackbox_push_success_total{app_group}
+- barito_blackbox_push_failed_total{app_group}
+- barito_blackbox_trace_data_delay_seconds{app_group}
+- barito_blackbox_trace_data_increase{app_group}
+
+
+--------
+2. Open Kibana & check if it functional
+Approach:
+a. Use Gate bot account to simulate hit url from barito-viewer.golabs.io
+b. Get kibana IP from consul, then hit it directly
+
+Metrics:
+- barito_blackbox_kibana_success_total{app_group}
+- barito_blackbox_kibana_failed_total{app_group, error}
+  + error: failed_fetch_consul_from_market, failed_fetch_kibana_from_consul, kibana_not_registered_on_consul, kibana_timeout, kibana_to_es_timeout
