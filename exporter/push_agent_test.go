@@ -55,7 +55,7 @@ func TestPushAgent(t *testing.T) {
 	defer cancel()
 
 	mr := mock.NewMockMetricRecorder(ctrl)
-	mr.EXPECT().IncreasePushLogSuccess("lama").Times(2)
+	mr.EXPECT().IncreasePushLogSuccess("lama").MinTimes(2)
 
 	agent := PushAgent{
 		appGroup:       "lama",
@@ -63,6 +63,7 @@ func TestPushAgent(t *testing.T) {
 		appPrefix:      "barito-log-probe",
 		produceURL:     srv.URL,
 		interval:       1 * time.Second,
+		timeField:      "barito_trace_time",
 		metricRecorder: mr,
 		ctx:            ctx,
 	}
@@ -98,6 +99,7 @@ func TestPushAgent_non200ShouldMarkedAsFailed(t *testing.T) {
 		secretKey:      "ABC123",
 		appPrefix:      "barito-log-probe",
 		produceURL:     srv.URL,
+		timeField:      "barito_trace_time",
 		interval:       1 * time.Second,
 		metricRecorder: mr,
 		ctx:            ctx,
@@ -127,9 +129,10 @@ func TestPushAgent_TimeoutShouldMarkedAsFailed(t *testing.T) {
 		appPrefix:      "barito-log-probe",
 		produceURL:     srv.URL,
 		interval:       1 * time.Second,
+		timeField:      "barito_trace_time",
 		metricRecorder: mr,
 		ctx:            ctx,
-		requestTimeout: 5 * time.Second,
+		requestTimeout: 2 * time.Second,
 	}
 	defer srv.Close()
 

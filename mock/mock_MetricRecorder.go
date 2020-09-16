@@ -33,25 +33,61 @@ func (m *MockMetricRecorder) EXPECT() *MockMetricRecorderMockRecorder {
 }
 
 // IncreasePushLogSuccess mocks base method
-func (m *MockMetricRecorder) IncreasePushLogSuccess(app_group string) {
+func (m *MockMetricRecorder) IncreasePushLogSuccess(appGroup string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "IncreasePushLogSuccess", app_group)
+	m.ctrl.Call(m, "IncreasePushLogSuccess", appGroup)
 }
 
 // IncreasePushLogSuccess indicates an expected call of IncreasePushLogSuccess
-func (mr *MockMetricRecorderMockRecorder) IncreasePushLogSuccess(app_group interface{}) *gomock.Call {
+func (mr *MockMetricRecorderMockRecorder) IncreasePushLogSuccess(appGroup interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreasePushLogSuccess", reflect.TypeOf((*MockMetricRecorder)(nil).IncreasePushLogSuccess), app_group)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreasePushLogSuccess", reflect.TypeOf((*MockMetricRecorder)(nil).IncreasePushLogSuccess), appGroup)
 }
 
 // IncreasePushLogFailed mocks base method
-func (m *MockMetricRecorder) IncreasePushLogFailed(app_group string) {
+func (m *MockMetricRecorder) IncreasePushLogFailed(appGroup string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "IncreasePushLogFailed", app_group)
+	m.ctrl.Call(m, "IncreasePushLogFailed", appGroup)
 }
 
 // IncreasePushLogFailed indicates an expected call of IncreasePushLogFailed
-func (mr *MockMetricRecorderMockRecorder) IncreasePushLogFailed(app_group interface{}) *gomock.Call {
+func (mr *MockMetricRecorderMockRecorder) IncreasePushLogFailed(appGroup interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreasePushLogFailed", reflect.TypeOf((*MockMetricRecorder)(nil).IncreasePushLogFailed), app_group)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreasePushLogFailed", reflect.TypeOf((*MockMetricRecorder)(nil).IncreasePushLogFailed), appGroup)
+}
+
+// IncreaseProbeElasticSearchSuccess mocks base method
+func (m *MockMetricRecorder) IncreaseProbeElasticSearchSuccess(appGroup string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "IncreaseProbeElasticSearchSuccess", appGroup)
+}
+
+// IncreaseProbeElasticSearchSuccess indicates an expected call of IncreaseProbeElasticSearchSuccess
+func (mr *MockMetricRecorderMockRecorder) IncreaseProbeElasticSearchSuccess(appGroup interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreaseProbeElasticSearchSuccess", reflect.TypeOf((*MockMetricRecorder)(nil).IncreaseProbeElasticSearchSuccess), appGroup)
+}
+
+// IncreaseProbeElasticSearchFailed mocks base method
+func (m *MockMetricRecorder) IncreaseProbeElasticSearchFailed(appGroup, reason string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "IncreaseProbeElasticSearchFailed", appGroup, reason)
+}
+
+// IncreaseProbeElasticSearchFailed indicates an expected call of IncreaseProbeElasticSearchFailed
+func (mr *MockMetricRecorderMockRecorder) IncreaseProbeElasticSearchFailed(appGroup, reason interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreaseProbeElasticSearchFailed", reflect.TypeOf((*MockMetricRecorder)(nil).IncreaseProbeElasticSearchFailed), appGroup, reason)
+}
+
+// SetProbeElasticsearchDelay mocks base method
+func (m *MockMetricRecorder) SetProbeElasticsearchDelay(appGroup string, delaySecond float64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetProbeElasticsearchDelay", appGroup, delaySecond)
+}
+
+// SetProbeElasticsearchDelay indicates an expected call of SetProbeElasticsearchDelay
+func (mr *MockMetricRecorderMockRecorder) SetProbeElasticsearchDelay(appGroup, delaySecond interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetProbeElasticsearchDelay", reflect.TypeOf((*MockMetricRecorder)(nil).SetProbeElasticsearchDelay), appGroup, delaySecond)
 }

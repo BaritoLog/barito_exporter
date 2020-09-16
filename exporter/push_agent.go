@@ -18,6 +18,7 @@ type PushAgent struct {
 	secretKey      string
 	appPrefix      string
 	produceURL     string
+	timeField      string
 	interval       time.Duration
 	requestTimeout time.Duration
 	ctx            context.Context
@@ -32,6 +33,7 @@ func NewPushAgent(code, secret string, ctx context.Context, cfg *config.Config, 
 		produceURL:     cfg.ProduceURL,
 		interval:       cfg.ProduceInterval,
 		requestTimeout: cfg.ProduceTimeout,
+		timeField:      cfg.ProduceTimeField,
 		ctx:            ctx,
 		metricRecorder: mR,
 	}
@@ -63,7 +65,7 @@ func (p *PushAgent) doRequest() error {
 		Timeout: p.requestTimeout,
 	}
 
-	body := fmt.Sprintf(`{"items": [{"barito_trace_time": "%d"}] }`, time.Now().UnixNano()/1000000)
+	body := fmt.Sprintf(`{"items": [{"%s": %d}] }`, p.timeField, time.Now().UnixNano()/1000000)
 	req, err := http.NewRequest("POST", p.produceURL, strings.NewReader(body))
 	if err != nil {
 		return errors.New("failed to create request")
@@ -72,6 +74,9 @@ func (p *PushAgent) doRequest() error {
 	req.Header.Set("X-App-Group-Secret", p.secretKey)
 	req.Header.Set("X-App-Name", p.appPrefix+"-"+p.appGroup)
 	resp, err := c.Do(req)
+	if err != nil {
+		return err
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		err = fmt.Errorf("Got response status %d", resp.StatusCode)

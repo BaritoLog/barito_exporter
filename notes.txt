@@ -13,8 +13,10 @@ a. Push log periodically to router to an appgroup, the exporter will count how m
 Metrics:
 - barito_blackbox_push_success_total{app_group}
 - barito_blackbox_push_failed_total{app_group}
-- barito_blackbox_trace_data_delay_seconds{app_group}
-- barito_blackbox_trace_data_increase{app_group}
+- barito_blackbox_probe_es_success_total{app_group}
+- barito_blackbox_probe_es_failed_total{app_group, error}
+  + error: failed_fetch_consul, no_elasticsearch, elasticsearch_timeout
+- barito_blackbox_proce_es_delay_seconds{app_group}
 
 
 --------
