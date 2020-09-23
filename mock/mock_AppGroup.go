@@ -74,6 +74,20 @@ func (mr *MockAppGroupMockRecorder) GetClusterName() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClusterName", reflect.TypeOf((*MockAppGroup)(nil).GetClusterName))
 }
 
+// GetSecret mocks base method
+func (m *MockAppGroup) GetSecret() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSecret")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetSecret indicates an expected call of GetSecret
+func (mr *MockAppGroupMockRecorder) GetSecret() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockAppGroup)(nil).GetSecret))
+}
+
 // GetListES mocks base method
 func (m *MockAppGroup) GetListES() ([]string, error) {
 	m.ctrl.T.Helper()
@@ -87,4 +101,19 @@ func (m *MockAppGroup) GetListES() ([]string, error) {
 func (mr *MockAppGroupMockRecorder) GetListES() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListES", reflect.TypeOf((*MockAppGroup)(nil).GetListES))
+}
+
+// GetKibanaHost mocks base method
+func (m *MockAppGroup) GetKibanaHost() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetKibanaHost")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetKibanaHost indicates an expected call of GetKibanaHost
+func (mr *MockAppGroupMockRecorder) GetKibanaHost() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKibanaHost", reflect.TypeOf((*MockAppGroup)(nil).GetKibanaHost))
 }

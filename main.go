@@ -26,8 +26,9 @@ func main() {
 
 	for _, mapAppGroup := range appGroups {
 		aG := appgroup.NewAppGroup(mapAppGroup["code"], mapAppGroup["secret"], cfg)
-		go createPushAgent(mapAppGroup["code"], mapAppGroup["secret"], cfg, mR).Run()
+		go createPushAgent(aG, cfg, mR).Run()
 		go createESProbeAgent(aG, cfg, mR).Run()
+		go createKibanaProbeAgent(aG, cfg, mR).Run()
 	}
 
 	http.Handle("/metrics", promhttp.HandlerFor(
@@ -37,18 +38,22 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
-func createPushAgent(code, secret string, cfg *config.Config, mR o11y.MetricRecorder) *exporter.PushAgent {
-	return exporter.NewPushAgent(code, secret, context.Background(), cfg, mR)
+func createPushAgent(appGroup appgroup.AppGroup, cfg *config.Config, mR o11y.MetricRecorder) *exporter.PushAgent {
+	return exporter.NewPushAgent(appGroup.GetClusterName(), appGroup.GetSecret(), context.Background(), cfg, mR)
 }
 
 func createESProbeAgent(appGroup appgroup.AppGroup, cfg *config.Config, mR o11y.MetricRecorder) *exporter.ESProbeAgent {
 	return exporter.NewESProbeAgent(appGroup, context.Background(), cfg, mR)
 }
 
+func createKibanaProbeAgent(appGroup appgroup.AppGroup, cfg *config.Config, mR o11y.MetricRecorder) *exporter.KibanaProbeAgent {
+	return exporter.NewKibanaProbeAgent(appGroup, context.Background(), cfg, mR)
+}
+
 func getClusterAndSecret() []map[string]string {
 	result := []map[string]string{}
 
-	file, err := os.Open("./secret_sample")
+	file, err := os.Open("./secrets_sample")
 	if err != nil {
 		log.Fatal(err)
 	}

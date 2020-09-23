@@ -80,6 +80,30 @@ func (mr *MockMetricRecorderMockRecorder) IncreaseProbeElasticSearchFailed(appGr
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreaseProbeElasticSearchFailed", reflect.TypeOf((*MockMetricRecorder)(nil).IncreaseProbeElasticSearchFailed), appGroup, reason)
 }
 
+// IncreaseProbeKibanaSuccess mocks base method
+func (m *MockMetricRecorder) IncreaseProbeKibanaSuccess(appGroup string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "IncreaseProbeKibanaSuccess", appGroup)
+}
+
+// IncreaseProbeKibanaSuccess indicates an expected call of IncreaseProbeKibanaSuccess
+func (mr *MockMetricRecorderMockRecorder) IncreaseProbeKibanaSuccess(appGroup interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreaseProbeKibanaSuccess", reflect.TypeOf((*MockMetricRecorder)(nil).IncreaseProbeKibanaSuccess), appGroup)
+}
+
+// IncreaseProbeKibanaFailed mocks base method
+func (m *MockMetricRecorder) IncreaseProbeKibanaFailed(appGroup, reason string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "IncreaseProbeKibanaFailed", appGroup, reason)
+}
+
+// IncreaseProbeKibanaFailed indicates an expected call of IncreaseProbeKibanaFailed
+func (mr *MockMetricRecorderMockRecorder) IncreaseProbeKibanaFailed(appGroup, reason interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreaseProbeKibanaFailed", reflect.TypeOf((*MockMetricRecorder)(nil).IncreaseProbeKibanaFailed), appGroup, reason)
+}
+
 // SetProbeElasticsearchDelay mocks base method
 func (m *MockMetricRecorder) SetProbeElasticsearchDelay(appGroup string, delaySecond float64) {
 	m.ctrl.T.Helper()

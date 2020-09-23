@@ -17,7 +17,9 @@ type AppGroup interface {
 	RefreshMetadata() error
 	GetName() string
 	GetClusterName() string
+	GetSecret() string
 	GetListES() ([]string, error)
+	GetKibanaHost() (string, error)
 }
 
 type appGroup struct {
@@ -45,6 +47,10 @@ func (a *appGroup) GetName() string {
 
 func (a *appGroup) GetClusterName() string {
 	return a.clusterName
+}
+
+func (a *appGroup) GetSecret() string {
+	return a.secret
 }
 
 func (a *appGroup) RefreshMetadata() error {
@@ -84,7 +90,6 @@ func (a *appGroup) RefreshMetadata() error {
 	if len(consulServiceNames) > 0 {
 		a.consulServiceNames = consulServiceNames
 	}
-	fmt.Println(a)
 	return nil
 }
 
@@ -108,6 +113,28 @@ func (a *appGroup) GetListES() ([]string, error) {
 		return listES, nil
 	}
 	return nil, errors.New("No ES found")
+}
+
+func (a *appGroup) GetKibanaHost() (string, error) {
+	if len(a.consulHosts) == 0 {
+		log.Errorf("Can't fetch kibana, no consul to contacted to")
+		return "", errors.New("Can't fetch kibana, no consul to contacted to")
+	}
+
+	serviceName, ok := a.consulServiceNames["kibana"]
+	if !ok {
+		log.Errorf("Can't find kibana service name")
+		return "", errors.New("Can't find kibana service name")
+	}
+	for _, consul := range a.consulHosts {
+		kibanaHost, err := fetchConsulServices(consul, serviceName)
+		if err != nil || len(kibanaHost) == 0 {
+			log.Errorf("Failed to fetch kibana, error: %v", err)
+			continue
+		}
+		return kibanaHost[0], nil
+	}
+	return "", errors.New("No Kibana found")
 }
 
 func fetchConsulServices(consulHost, serviceName string) ([]string, error) {
