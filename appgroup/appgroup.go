@@ -19,6 +19,7 @@ type AppGroup interface {
 	GetClusterName() string
 	GetSecret() string
 	GetListES() ([]string, error)
+	GetListKafka() ([]string, error)
 	GetKibanaHost() (string, error)
 }
 
@@ -110,9 +111,37 @@ func (a *appGroup) GetListES() ([]string, error) {
 			log.Errorf("Failed to fetch elasticsearch, error: %v", err)
 			continue
 		}
+
+		for i := 0; i < len(listES); i++ {
+			if !strings.HasPrefix(listES[i], "http") {
+				listES[i] = "http://" + listES[i]
+			}
+		}
 		return listES, nil
 	}
 	return nil, errors.New("No ES found")
+}
+
+func (a *appGroup) GetListKafka() ([]string, error) {
+	if len(a.consulHosts) == 0 {
+		log.Errorf("Can't fetch Kafka, no consul to contacted to")
+		return nil, errors.New("Can't fetch Kafka, no consul to contacted to")
+	}
+
+	serviceName, ok := a.consulServiceNames["kafka"]
+	if !ok {
+		log.Errorf("Can't find kafka service name")
+		return nil, errors.New("Can't find kafka service name")
+	}
+	for _, consul := range a.consulHosts {
+		listKafka, err := fetchConsulServices(consul, serviceName)
+		if err != nil {
+			log.Errorf("Failed to fetch kafka, error: %v", err)
+			continue
+		}
+		return listKafka, nil
+	}
+	return nil, errors.New("No Kafka found")
 }
 
 func (a *appGroup) GetKibanaHost() (string, error) {
@@ -131,6 +160,11 @@ func (a *appGroup) GetKibanaHost() (string, error) {
 		if err != nil || len(kibanaHost) == 0 {
 			log.Errorf("Failed to fetch kibana, error: %v", err)
 			continue
+		}
+		for i := 0; i < len(kibanaHost); i++ {
+			if !strings.HasPrefix(kibanaHost[i], "http") {
+				kibanaHost[i] = "http://" + kibanaHost[i]
+			}
 		}
 		return kibanaHost[0], nil
 	}
@@ -177,7 +211,7 @@ func fetchConsulServices(consulHost, serviceName string) ([]string, error) {
 		host, hostOK := s.Path("Service.Address").Data().(string)
 		port, portOK := s.Path("Service.Port").Data().(float64)
 		if hostOK && portOK {
-			hosts = append(hosts, fmt.Sprintf("http://%s:%d", host, int(port)))
+			hosts = append(hosts, fmt.Sprintf("%s:%d", host, int(port)))
 		}
 	}
 	return hosts, nil

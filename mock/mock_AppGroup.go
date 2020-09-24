@@ -103,6 +103,21 @@ func (mr *MockAppGroupMockRecorder) GetListES() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListES", reflect.TypeOf((*MockAppGroup)(nil).GetListES))
 }
 
+// GetListKafka mocks base method
+func (m *MockAppGroup) GetListKafka() ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetListKafka")
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetListKafka indicates an expected call of GetListKafka
+func (mr *MockAppGroupMockRecorder) GetListKafka() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListKafka", reflect.TypeOf((*MockAppGroup)(nil).GetListKafka))
+}
+
 // GetKibanaHost mocks base method
 func (m *MockAppGroup) GetKibanaHost() (string, error) {
 	m.ctrl.T.Helper()

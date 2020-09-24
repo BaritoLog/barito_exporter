@@ -3,10 +3,13 @@ package main
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/Shopify/sarama"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/BaritoLog/barito-blackbox-exporter/appgroup"
@@ -22,14 +25,20 @@ func main() {
 	cfg := config.NewConfig()
 	mR := o11y.NewMetricRecorder()
 
-	appGroups := getClusterAndSecret()
+	mapAppGroups := getClusterAndSecret()
+	appGroups := []appgroup.AppGroup{}
 
-	for _, mapAppGroup := range appGroups {
-		aG := appgroup.NewAppGroup(mapAppGroup["code"], mapAppGroup["secret"], cfg)
+	for _, v := range mapAppGroups {
+		appGroups = append(appGroups, appgroup.NewAppGroup(v["code"], v["secret"], cfg))
+	}
+
+	for _, aG := range appGroups {
 		go createPushAgent(aG, cfg, mR).Run()
 		go createESProbeAgent(aG, cfg, mR).Run()
 		go createKibanaProbeAgent(aG, cfg, mR).Run()
 	}
+
+	go deleteProberKafkaTopic(appGroups, cfg)
 
 	http.Handle("/metrics", promhttp.HandlerFor(
 		mR.GetRegistry(),
@@ -71,4 +80,33 @@ func getClusterAndSecret() []map[string]string {
 
 	log.Infof("Found %d appgroup", len(result))
 	return result
+}
+
+func deleteProberKafkaTopic(appGroups []appgroup.AppGroup, cfg *config.Config) {
+	for {
+		for _, aG := range appGroups {
+			aG.RefreshMetadata()
+			listKafka, err := aG.GetListKafka()
+			if err != nil {
+				log.Errorf("Failed to GetListKafka on app_group: %q, err: %v", aG.GetClusterName(), err)
+				continue
+			}
+
+			saramaCfg := sarama.NewConfig()
+			saramaCfg.Version = sarama.V2_5_0_0
+			clusterAdmin, err := sarama.NewClusterAdmin(listKafka, saramaCfg)
+			if err != nil {
+				log.Errorf("Failed to create sarama client, app_group: %q, err: %v", aG.GetClusterName(), err)
+				continue
+			}
+
+			topicName := fmt.Sprintf("%s-%s_pb", cfg.ProduceAppPrefix, aG.GetClusterName())
+			err = clusterAdmin.DeleteTopic(topicName)
+			if err != nil {
+				log.Errorf("Failed to delete topic, app_group: %q, err: %v", aG.GetClusterName(), err)
+				continue
+			}
+		}
+		time.Sleep(cfg.DeleteTopicInterval)
+	}
 }

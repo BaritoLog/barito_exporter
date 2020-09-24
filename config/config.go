@@ -19,6 +19,7 @@ type Config struct {
 	ESProbeTimeout      time.Duration
 	KibanaProbeInterval time.Duration
 	KibanaProbeTimeout  time.Duration
+	DeleteTopicInterval time.Duration
 }
 
 func NewConfig() *Config {
@@ -34,6 +35,7 @@ func NewConfig() *Config {
 		ESProbeTimeout:      time.Duration(envOrDefaultInt("ES_PROBE_TIMEOUT", 10)) * time.Second,
 		KibanaProbeInterval: time.Duration(envOrDefaultInt("KIBANA_PROBE_INTERVAL", 60)) * time.Second,
 		KibanaProbeTimeout:  time.Duration(envOrDefaultInt("KIBANA_PROBE_TIMEOUT", 30)) * time.Second,
+		DeleteTopicInterval: time.Duration(envOrDefaultInt("DELETE_TOPIC_INTERVAL", 3600)) * time.Second,
 	}
 }
 

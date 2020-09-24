@@ -136,3 +136,39 @@ func TestGetKibanaHost(t *testing.T) {
 		t.Errorf("Invalid consul path called, got:\n%q,\nwant:\n%q\n", pathCalled, expectedPathCalled)
 	}
 }
+
+func TestGetListKafka(t *testing.T) {
+	var pathCalled string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pathCalled = r.URL.Path
+
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		resp := `[
+		{ "Service": { "Address": "172.0.0.1", "Port": 9092 } },
+		{ "Service": { "Address": "172.0.0.2", "Port": 9092 } }
+		]`
+		w.Write([]byte(resp))
+	}))
+
+	aG := appGroup{
+		clusterName:        "lama",
+		consulHosts:        []string{srv.URL},
+		consulServiceNames: map[string]string{"kafka": "kafka"},
+	}
+
+	kafkaHosts, err := aG.GetListKafka()
+	if err != nil {
+		t.Fatalf("Should not return error, got: %v", err)
+	}
+
+	expectedKafkaHosts := []string{"172.0.0.1:9092", "172.0.0.2:9092"}
+	if !reflect.DeepEqual(kafkaHosts, expectedKafkaHosts) {
+		t.Errorf("Invalid Kafka Host, got:\n%v,\nwant:\n%v\n", kafkaHosts, expectedKafkaHosts)
+	}
+
+	expectedPathCalled := fmt.Sprintf("/v1/health/service/%s", aG.consulServiceNames["kafka"])
+	if pathCalled != expectedPathCalled {
+		t.Errorf("Invalid consul path called, got:\n%q,\nwant:\n%q\n", pathCalled, expectedPathCalled)
+	}
+}

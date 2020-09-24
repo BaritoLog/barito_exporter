@@ -1,6 +1,7 @@
 Should have 2 feature:
 1. Push message to barito
 2. Open Kibana & check if it functional
+3. Delete kafka topic periodically barito-prober-#{app_group}
 
 Global metrics:
 - barito_appgroup_tps{appgroup, name, capacity, status, retention } tps
