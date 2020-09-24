@@ -38,7 +38,8 @@ func main() {
 		go createKibanaProbeAgent(aG, cfg, mR).Run()
 	}
 
-	go deleteProberKafkaTopic(appGroups, cfg)
+	// todo: disable for now, because after deleting the topic, consumer must be restarted
+	//go deleteProberKafkaTopic(appGroups, cfg)
 
 	http.Handle("/metrics", promhttp.HandlerFor(
 		mR.GetRegistry(),
