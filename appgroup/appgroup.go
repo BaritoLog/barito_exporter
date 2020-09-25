@@ -246,3 +246,43 @@ func fetchAppgroupMetadata(clusterName, baritoMarketHost, accessToken string) ([
 
 	return body, nil
 }
+
+func GetListAppGroups(cfg config.Config) ([]*appGroup, error) {
+	result := []*appGroup{}
+
+	maxPage := 100
+	page := 1
+	for {
+		url := fmt.Sprintf("%s%s?page=%d&access_token=%s", cfg.BaritoMarketHost, cfg.BaritoMarketProfileIndexPath, page, cfg.BaritoMarketToken)
+		resp, err := http.Get(url)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		jsonParsed, err := gabs.ParseJSON(body)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, c := range jsonParsed.Children() {
+			clusterName, clusterNameOk := c.Path("cluster_name").Data().(string)
+			appgroupSecret, appGroupSecretOk := c.Path("app_group_secret").Data().(string)
+			if clusterNameOk && appGroupSecretOk {
+				result = append(result, NewAppGroup(clusterName, appgroupSecret, &cfg))
+			}
+		}
+
+		if len(jsonParsed.Children()) < 10 || page >= maxPage {
+			break
+		}
+
+		page++
+	}
+
+	return result, nil
+}

@@ -6,7 +6,11 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"reflect"
+	"strconv"
+	"strings"
 	"testing"
+
+	"github.com/BaritoLog/barito-blackbox-exporter/config"
 )
 
 func TestRefreshMetadata(t *testing.T) {
@@ -170,5 +174,55 @@ func TestGetListKafka(t *testing.T) {
 	expectedPathCalled := fmt.Sprintf("/v1/health/service/%s", aG.consulServiceNames["kafka"])
 	if pathCalled != expectedPathCalled {
 		t.Errorf("Invalid consul path called, got:\n%q,\nwant:\n%q\n", pathCalled, expectedPathCalled)
+	}
+}
+
+func TestGetListAppGroups(t *testing.T) {
+	requests := []map[string]string{}
+	expectedRequests := []map[string]string{
+		{"path": "/api/v2/profile_index", "page": "1"},
+		{"path": "/api/v2/profile_index", "page": "2"},
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests = append(requests, map[string]string{
+			"path": r.URL.Path,
+			"page": r.URL.Query().Get("page"),
+		})
+		w.WriteHeader(http.StatusOK)
+
+		bodyList := []string{}
+		page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+		if page == 1 {
+			for i := 1; i <= 10; i++ {
+				bodyList = append(bodyList, fmt.Sprintf(`{"cluster_name": "%d", "app_group_secret": "abc"}`, i))
+			}
+		}
+
+		if page == 2 {
+			for i := 1; i <= 2; i++ {
+				bodyList = append(bodyList, fmt.Sprintf(`{"cluster_name": "%d", "app_group_secret": "abc"}`, i))
+			}
+		}
+		body := fmt.Sprintf(`[%s]`, strings.Join(bodyList, ","))
+		w.Write([]byte(body))
+	}))
+
+	cfg := config.Config{
+		BaritoMarketHost:             srv.URL,
+		BaritoMarketToken:            "ABC007",
+		BaritoMarketProfileIndexPath: "/api/v2/profile_index",
+	}
+
+	appGroups, err := GetListAppGroups(cfg)
+	if err != nil {
+		t.Fatalf("Should not return error, got: %v", err)
+	}
+
+	if !reflect.DeepEqual(expectedRequests, requests) {
+		t.Fatalf("Should got called with these request:\n%v\ngot:\n%v\n", expectedRequests, requests)
+	}
+
+	if len(appGroups) != 12 {
+		t.Fatalf("Should return 12 appgroups, got: %d", len(appGroups))
 	}
 }
