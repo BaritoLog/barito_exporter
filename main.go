@@ -25,17 +25,18 @@ func main() {
 	cfg := config.NewConfig()
 	mR := o11y.NewMetricRecorder()
 
-	mapAppGroups := getClusterAndSecret()
-	appGroups := []appgroup.AppGroup{}
+	mapAppGroups := map[string]bool{}
 
-	for _, v := range mapAppGroups {
-		appGroups = append(appGroups, appgroup.NewAppGroup(v["code"], v["secret"], cfg))
+	appGroups, err := appgroup.GetListAppGroups(*cfg)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to get list app group from BaritoMarket: %v", err))
 	}
 
 	for _, aG := range appGroups {
 		go createPushAgent(aG, cfg, mR).Run()
 		go createESProbeAgent(aG, cfg, mR).Run()
 		go createKibanaProbeAgent(aG, cfg, mR).Run()
+		mapAppGroups[aG.GetClusterName()] = true
 	}
 
 	// todo: disable for now, because after deleting the topic, consumer must be restarted
